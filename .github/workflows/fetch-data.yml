@@ -1,0 +1,30 @@
+name: Veri çek
+
+on:
+  schedule:
+    - cron: "17 3 * * *"   # her gün 03:17 UTC (06:17 TSİ)
+  workflow_dispatch:        # Actions sekmesinden elle çalıştırma butonu
+
+permissions:
+  contents: write
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: npm ve pypistats verisini çek
+        run: python scripts/fetch_data.py
+
+      - name: Değişiklikleri depoya yaz
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/
+          git diff --cached --quiet || git commit -m "Veri güncellemesi: $(date -u +'%Y-%m-%d %H:%M UTC')"
+          git push
