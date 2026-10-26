@@ -1,0 +1,8 @@
+# Kütüphane Popülerlik Karşılaştırıcı — Cloudflare Pages yapılandırması (kod olarak altyapı)
+# Ürün statik bir veri ürünüdür: sunucu kodu ve API anahtarı yoktur.
+# Yayın: Cloudflare Pages Git entegrasyonu, main dalına her push'ta.
+# Derleme komutu (Cloudflare panelinde): bash scripts/build_site.sh
+
+name = "kutuphane-populerlik"
+compatibility_date = "2026-09-01"
+pages_build_output_dir = "_site"
