@@ -1,0 +1,4 @@
+Contact: https://github.com/Miremgecici/kutuphane-populerlik/security/advisories/new
+Expires: 2027-06-30T20:59:00.000Z
+Preferred-Languages: tr, en
+Policy: https://github.com/Miremgecici/kutuphane-populerlik/blob/main/README.md#güvenlik-ve-altyapı
