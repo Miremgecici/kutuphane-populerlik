@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kütüphane Popülerlik Karşılaştırıcı</title>
+  <meta name="description" content="npm ve PyPI paketlerinin günlük indirme sayılarını karşılaştıran canlı veri ürünü.">
+  <link rel="stylesheet" href="assets/style.css">
+  <script src="assets/app.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap">
+      <h1>Kütüphane Popülerlik Karşılaştırıcı</h1>
+      <p class="lede">Müfredatta hangi kütüphane öğretilmeli? npm ve PyPI paketlerinin günlük indirme sayıları, her gün otomatik güncellenir.</p>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <nav class="tabs" aria-label="Paket ekosistemi">
+      <button type="button" class="tab" data-source="npm" aria-pressed="true">npm (JavaScript)</button>
+      <button type="button" class="tab" data-source="pypi" aria-pressed="false">PyPI (Python)</button>
+    </nav>
+
+    <p id="status" class="status" role="status">Veri yükleniyor…</p>
+
+    <section aria-labelledby="kpi-title">
+      <h2 id="kpi-title">Son 30 gün</h2>
+      <div id="kpis" class="kpis"></div>
+    </section>
+
+    <section aria-labelledby="chart-title">
+      <h2 id="chart-title">Günlük indirme (7 günlük hareketli ortalama)</h2>
+      <div id="legend" class="legend"></div>
+      <div id="chart" class="chart" role="img" aria-label="Paketlerin günlük indirme sayısı çizgi grafiği"></div>
+    </section>
+
+    <section aria-labelledby="table-title">
+      <h2 id="table-title">Karşılaştırma tablosu</h2>
+      <div class="table-scroll">
+        <table id="table">
+          <thead>
+            <tr>
+              <th scope="col">Paket</th>
+              <th scope="col" class="num">Son 30 gün</th>
+              <th scope="col" class="num">Önceki 30 güne göre</th>
+              <th scope="col" class="num">Günlük ortalama</th>
+              <th scope="col" class="num">Pay</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <footer class="wrap site-footer">
+    <p id="source"></p>
+    <p>Müesser İrem Gecici · 2516016027 · Manisa Celal Bayar Üniversitesi. Veriler toplulaştırılmış indirme sayılarıdır; kişisel veri içermez. Müşteri kurgusaldır.</p>
+  </footer>
+</body>
+</html>
