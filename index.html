@@ -4,59 +4,111 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Kütüphane Popülerlik Karşılaştırıcı</title>
-  <meta name="description" content="npm ve PyPI paketlerinin günlük indirme sayılarını karşılaştıran canlı veri ürünü.">
+  <meta name="description" content="npm ve PyPI paketlerinin günlük indirme sayılarını karşılaştıran, her gün otomatik güncellenen karar destek panosu.">
+  <meta name="theme-color" content="#1f5fbf">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="assets/icons/icon-192.png" type="image/png">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
   <link rel="stylesheet" href="assets/style.css">
   <script src="assets/app.js" defer></script>
 </head>
 <body>
+  <a class="skip" href="#ana">İçeriğe geç</a>
+
   <header class="site-header">
     <div class="wrap">
       <h1>Kütüphane Popülerlik Karşılaştırıcı</h1>
-      <p class="lede">Müfredatta hangi kütüphane öğretilmeli? npm ve PyPI paketlerinin günlük indirme sayıları, her gün otomatik güncellenir.</p>
+      <p class="lede">Müfredatta hangi kütüphane öğretilmeli? npm ve PyPI paketlerinin günlük indirme sayılarını karşılaştırın. Veri her gün otomatik güncellenir.</p>
     </div>
   </header>
 
-  <main class="wrap">
-    <nav class="tabs" aria-label="Paket ekosistemi">
-      <button type="button" class="tab" data-source="npm" aria-pressed="true">npm (JavaScript)</button>
-      <button type="button" class="tab" data-source="pypi" aria-pressed="false">PyPI (Python)</button>
-    </nav>
+  <main id="ana" class="wrap">
+    <p id="meta" class="meta" role="status" aria-live="polite">Veri yükleniyor…</p>
+    <div id="notice" class="notice" role="alert" hidden></div>
 
-    <p id="status" class="status" role="status">Veri yükleniyor…</p>
+    <!-- Kontrol paneli -->
+    <section class="panel" aria-labelledby="kontrol-baslik">
+      <h2 id="kontrol-baslik" class="visually-hidden">Kontroller</h2>
 
-    <section aria-labelledby="kpi-title">
-      <h2 id="kpi-title">Son 30 gün</h2>
+      <fieldset class="pick">
+        <legend>Paket seç <span class="hint">(en fazla 5)</span> <span id="pick-count" class="count" aria-live="polite"></span></legend>
+        <div id="pick-groups" class="pick-groups"></div>
+        <div class="pick-actions">
+          <button type="button" id="btn-clear" class="btn">Seçimi temizle</button>
+          <button type="button" id="btn-share" class="btn">Bağlantıyı kopyala</button>
+        </div>
+      </fieldset>
+
+      <div class="controls">
+        <fieldset class="seg">
+          <legend>Ölçek</legend>
+          <label><input type="radio" name="olcek" value="ham"><span>Ham</span></label>
+          <label><input type="radio" name="olcek" value="log"><span>Log</span></label>
+          <label><input type="radio" name="olcek" value="endeks"><span>Endeks (=100)</span></label>
+        </fieldset>
+
+        <div class="field">
+          <label for="donem">Dönem</label>
+          <select id="donem">
+            <option value="30">Son 30 gün</option>
+            <option value="90">Son 90 gün</option>
+            <option value="180">Son 180 gün</option>
+            <option value="365">Son 365 gün</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <!-- KPI -->
+    <section aria-labelledby="kpi-baslik">
+      <h2 id="kpi-baslik">Özet</h2>
       <div id="kpis" class="kpis"></div>
     </section>
 
-    <section aria-labelledby="chart-title">
-      <h2 id="chart-title">Günlük indirme (7 günlük hareketli ortalama)</h2>
-      <div id="legend" class="legend"></div>
-      <div id="chart" class="chart" role="img" aria-label="Paketlerin günlük indirme sayısı çizgi grafiği"></div>
+    <!-- Ana grafik -->
+    <section id="ana-grafik" class="card chart-card" aria-labelledby="grafik-baslik">
+      <div class="card-head">
+        <h2 id="grafik-baslik">Günlük indirme</h2>
+        <button type="button" id="btn-full" class="btn" aria-keyshortcuts="F">Tam ekran (F)</button>
+      </div>
+      <p id="grafik-alt" class="sub"></p>
+      <ul id="legend" class="legend" aria-label="Grafik açıklaması"></ul>
+      <div id="chart" class="chart" role="img"></div>
+      <p id="chart-summary" class="summary"></p>
+      <details class="as-table">
+        <summary>Veriyi tablo olarak gör</summary>
+        <div class="table-scroll" tabindex="0" role="region" aria-label="Ana grafik verisi">
+          <table id="chart-table"></table>
+        </div>
+      </details>
     </section>
 
-    <section aria-labelledby="table-title">
-      <h2 id="table-title">Karşılaştırma tablosu</h2>
-      <div class="table-scroll">
-        <table id="table">
-          <thead>
-            <tr>
-              <th scope="col">Paket</th>
-              <th scope="col" class="num">Son 30 gün</th>
-              <th scope="col" class="num">Önceki 30 güne göre</th>
-              <th scope="col" class="num">Günlük ortalama</th>
-              <th scope="col" class="num">Pay</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
+    <!-- İkincil grafik -->
+    <section class="card" aria-labelledby="bar-baslik">
+      <h2 id="bar-baslik">Dönem toplamı</h2>
+      <div id="bars" class="bars" role="img"></div>
+      <p id="bar-summary" class="summary"></p>
+      <details class="as-table">
+        <summary>Veriyi tablo olarak gör</summary>
+        <div class="table-scroll" tabindex="0" role="region" aria-label="Dönem toplamı verisi">
+          <table id="bar-table"></table>
+        </div>
+      </details>
+    </section>
+
+    <!-- Detay tablosu -->
+    <section class="card" aria-labelledby="tablo-baslik">
+      <h2 id="tablo-baslik">Karşılaştırma tablosu</h2>
+      <p class="sub">Sıralamak için sütun başlığına tıklayın.</p>
+      <div class="table-scroll" tabindex="0" role="region" aria-label="Karşılaştırma tablosu">
+        <table id="detail"></table>
       </div>
     </section>
   </main>
 
   <footer class="wrap site-footer">
-    <p id="source"></p>
-    <p>Müesser İrem Gecici · 2516016027 · Manisa Celal Bayar Üniversitesi. Veriler toplulaştırılmış indirme sayılarıdır; kişisel veri içermez. Müşteri kurgusaldır.</p>
+    <p id="source">Kaynak: <a href="https://github.com/npm/registry/blob/main/docs/download-counts.md">npm downloads API</a> · <a href="https://pypistats.org/api/">pypistats.org API</a></p>
+    <p>Müesser İrem Gecici · 2516016027 · BVA 2245. Veriler toplulaştırılmış indirme sayılarıdır; kişisel veri içermez. Müşteri kurgusaldır. <a href="https://github.com/Miremgecici/kutuphane-populerlik">Kaynak kod</a></p>
   </footer>
 </body>
 </html>
