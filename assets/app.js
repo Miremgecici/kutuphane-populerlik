@@ -56,7 +56,7 @@ function readUrl() {
   const p = params.get("p");
   state.pkgs = p === null ? DEFAULT_PKGS.slice() : p.split(",").filter(Boolean).slice(0, MAX_PKGS);
   const s = params.get("olcek");
-  if (s in SCALES) state.scale = s;
+  if (s !== null && Object.hasOwn(SCALES, s)) state.scale = s; // yalnızca izin listesindeki değerler
   const d = Number(params.get("donem"));
   if (PERIODS.includes(d)) state.period = d;
 }
