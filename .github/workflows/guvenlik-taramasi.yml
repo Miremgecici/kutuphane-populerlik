@@ -1,0 +1,32 @@
+name: Güvenlik taraması (gizli anahtar)
+
+# Depodaki tüm geçmişte API anahtarı, token veya şifre arar (gitleaks).
+# Bir bulgu olursa iş akışı kırmızı olur ve e-posta bildirimi gelir.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: "41 4 * * 1"    # her pazartesi 04:41 UTC
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  gitleaks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          fetch-depth: 0          # tüm commit geçmişini tara
+          persist-credentials: false
+
+      - name: gitleaks
+        uses: gitleaks/gitleaks-action@ff98106e4c7b2bc287b24eaf42907196329070c7 # v2
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          GITLEAKS_ENABLE_COMMENTS: false
+          GITLEAKS_ENABLE_UPLOAD_ARTIFACT: false
