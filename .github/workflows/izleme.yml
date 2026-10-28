@@ -1,0 +1,55 @@
+name: İzleme ve alarm
+
+# Canlı ürünü 6 saatte bir kontrol eder (erişim, güvenlik başlıkları, veri tazeliği).
+# Log: her çalıştırmanın çıktısı Actions sekmesinde saklanır.
+# Alarm: kontrol başarısız olursa "ALARM" etiketli bir issue açılır (e-posta bildirimi gelir);
+#        sorun düzelince issue otomatik kapanır.
+on:
+  schedule:
+    - cron: "23 */6 * * *"
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: izleme
+  cancel-in-progress: false
+
+jobs:
+  saglik:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      issues: write        # alarm issue'su açmak / kapatmak için
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+
+      - name: Sağlık kontrolü
+        id: kontrol
+        run: |
+          set +e
+          bash scripts/saglik_kontrolu.sh https://kutuphane-populerlik.pages.dev | tee kontrol.log
+          echo "kod=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
+
+      - name: Alarm aç veya kapat
+        env:
+          GH_TOKEN: ${{ github.token }}
+          KOD: ${{ steps.kontrol.outputs.kod }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          gh label create ALARM --color B60205 --description "İzleme alarmı" 2>/dev/null || true
+          ACIK="$(gh issue list --label ALARM --state open --json number --jq '.[0].number')"
+          if [ "$KOD" != "0" ]; then
+            BODY="$(printf 'İzleme kontrolü başarısız oldu.\n\nÇalıştırma: %s\n\n```\n%s\n```' "$RUN_URL" "$(cat kontrol.log)")"
+            if [ -n "$ACIK" ]; then
+              gh issue comment "$ACIK" --body "$BODY"
+            else
+              gh issue create --title "ALARM: kutuphane-populerlik.pages.dev kontrolü başarısız" --label ALARM --body "$BODY"
+            fi
+            exit 1
+          elif [ -n "$ACIK" ]; then
+            gh issue close "$ACIK" --comment "Kontroller yeniden başarılı: $RUN_URL"
+          fi
