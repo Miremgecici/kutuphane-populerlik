@@ -65,10 +65,10 @@ flowchart LR
 | Ana dal koruması | `main` dalında doğrudan push ve force push kapalı, PR zorunlu. Otomatik veri güncellemesi de PR ile gelir ([`scripts/pr_ile_birlestir.sh`](scripts/pr_ile_birlestir.sh)). |
 | Gizli anahtar ve bağımlılık taraması | gitleaks her push'ta, PR'da ve haftalık ([`guvenlik-taramasi.yml`](.github/workflows/guvenlik-taramasi.yml)); GitHub secret scanning + push protection; Dependabot haftalık ([`dependabot.yml`](.github/dependabot.yml)). Tüm Actions commit SHA'sı ile sabitlenmiştir. |
 | Kod olarak altyapı | `wrangler.toml` (Pages yapılandırması), `_headers` (güvenlik başlıkları), `scripts/build_site.sh` (yayınlanacak dosyaların izin listesi), `.github/` (CI/CD ve izleme). Panelden yapılan: Pages projesinin GitHub'a bağlanması ve derleme komutu, hesap güvenliği ayarları. |
-| Web güvenliği | HTTPS zorunlu, HSTS; CSP `script-src 'self'` (inline script/stil yok); COEP/COOP/CORP, `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy`, `frame-ancestors 'none'`. Mozilla Observatory **A+ (140/100)**, securityheaders.com **A+**. [`/.well-known/security.txt`](.well-known/security.txt), [`SECURITY.md`](SECURITY.md) |
+| Web güvenliği | HTTPS zorunlu, HSTS; CSP `script-src 'self'` (inline script/stil yok); COEP/COOP/CORP, `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy`, `frame-ancestors 'none'`. Mozilla Observatory **A+ (150/100)**, securityheaders.com **A+**. [`/.well-known/security.txt`](.well-known/security.txt), [`SECURITY.md`](SECURITY.md) |
 | Güvenlik testi | OWASP ZAP baseline, yalnızca kendi adresimize: önce 1 orta + 1 düşük → sonra **0 orta / düşük / yüksek**. Raporlar: [`docs/zap/once`](docs/zap/once/report_md.md), [`docs/zap/sonra`](docs/zap/sonra/report_md.md) |
 | Tehdit modeli | DFD üzerinde STRIDE, 11 tehdit, olasılık × etki risk puanı ve kalan risk: [`docs/tehdit-modeli.md`](docs/tehdit-modeli.md) |
-| İzleme ve alarm | 6 saatte bir erişim, güvenlik başlıkları ve veri tazeliği kontrolü; başarısızlıkta `ALARM` etiketli issue + e-posta ([`izleme.yml`](.github/workflows/izleme.yml)). Log'lar Actions çalışma kayıtlarında. Cloudflare başarısız yayın bildirimi. |
+| İzleme ve alarm | 6 saatte bir erişim, güvenlik başlıkları ve veri tazeliği kontrolü; başarısızlıkta `ALARM` etiketli issue + e-posta ([`izleme.yml`](.github/workflows/izleme.yml)). Log'lar Actions çalışma kayıtlarında; Cloudflare her commit'e yayın durumunu yazar. |
 | Olay müdahalesi | "API anahtarım sızdı" runbook'u: [`docs/runbook-anahtar-sizintisi.md`](docs/runbook-anahtar-sizintisi.md) |
 | Yayınlanan dosyalar | Yalnızca `index.html`, `manifest.webmanifest`, `sw.js`, `assets/`, `data/`, `.well-known/`. `scripts/`, `docs/`, `.github/` yayınlanmaz. |
 | Maliyet | Cloudflare Pages ve GitHub Actions ücretsiz katman: **0 TL**. Cloudflare'de ödeme yöntemi tanımlı değil; GitHub'da 0 USD bütçe uyarısı. |
@@ -97,7 +97,7 @@ Python 3.10+ yeterlidir, ek paket gerekmez.
 
 ## CV cümlesi
 
-**Bulut ve güvenlik:** Canlı veri ürünümü Cloudflare Pages'e kod olarak altyapıyla taşıdım; anahtarsız mimari, SHA ile sabitlenmiş ve en az yetkili GitHub Actions, gitleaks ve Dependabot kurdum; CSP ve HSTS ile Mozilla Observatory'de A+ (140/100) aldım ve OWASP ZAP bulgularını 1 orta + 1 düşükten 0'a indirdim.
+**Bulut ve güvenlik:** Canlı veri ürünümü Cloudflare Pages'e kod olarak altyapıyla taşıdım; anahtarsız mimari, SHA ile sabitlenmiş ve en az yetkili GitHub Actions, gitleaks ve Dependabot kurdum; CSP ve HSTS ile Mozilla Observatory'de A+ (150/100) aldım ve OWASP ZAP bulgularını 1 orta + 1 düşükten 0'a indirdim.
 
 ## Yapay zekâ kullanım beyanı
 
