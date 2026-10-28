@@ -7,6 +7,8 @@
   X-Frame-Options: DENY
   Cross-Origin-Opener-Policy: same-origin
   Cross-Origin-Resource-Policy: same-origin
+  Cross-Origin-Embedder-Policy: require-corp
+  ! Access-Control-Allow-Origin
 
 /data/*
   Cache-Control: public, max-age=300
