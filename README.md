@@ -19,7 +19,8 @@ Bir yazılım/veri bilimi eğitim programının müfredat ekibi için, hangi kü
 - [x] Başlangıç arayüzü bulutta yayında (grafik, KPI, tablo)
 - [x] Güvenlik başlıkları ve CSP (`_headers`), `/.well-known/security.txt`
 - [ ] Arayüz, ileri özellik, durumlar (27–28 Ekim)
-- [ ] Hesap güvenliği (MFA/passkey, IAM), branch protection, secret scanning, ZAP taraması (27–28 Ekim)
+- [x] ZAP önce/sonra taraması, STRIDE tehdit modeli, runbook, izleme ve alarm, gitleaks, Dependabot (28 Ekim)
+- [ ] Hesap güvenliği ayarları: MFA/passkey, ruleset (branch protection), secret scanning, en az yetki testi (28–29 Ekim)
 - [ ] Kullanıcı testi, portfolyo vaka sayfası, demo videosu (30 Ekim)
 
 ## Mimari
@@ -54,14 +55,23 @@ flowchart LR
 
 ## Güvenlik ve Altyapı
 
+![Mimari ve güven sınırları](docs/mimari-diyagram.png)
+
 | Konu | Uygulama |
 | --- | --- |
 | Gizli anahtarlar | Ürün anahtar gerektiren hiçbir kaynak kullanmaz; istemci kodunda, depoda ve log'larda anahtar yoktur. Dağıtım token'ı da yoktur: Cloudflare Pages, GitHub uygulaması üzerinden yayınlar. CI yalnızca GitHub'ın kısa ömürlü `GITHUB_TOKEN`'ını kullanır. |
-| En az yetki | Cloudflare GitHub uygulaması yalnızca bu depoya erişebilir (Only select repositories). `fetch-data.yml` yalnızca `contents: write` ister; veriyi depoya yazmak için gereklidir. |
-| Kod olarak altyapı | `wrangler.toml` (proje adı, çıktı klasörü), `_headers` (güvenlik başlıkları), `scripts/build_site.sh` (yayınlanacak dosyaların izin listesi). Panelden yapılan: Pages projesinin GitHub'a bağlanması ve derleme komutu. |
-| Web güvenliği | HTTPS zorunlu, HSTS; CSP `script-src 'self'` (inline script/stil yok); `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy`, `frame-ancestors 'none'`. Güvenlik açığı bildirimi: [`/.well-known/security.txt`](.well-known/security.txt). |
-| Yayınlanan dosyalar | Yalnızca `index.html`, `assets/`, `data/`, `.well-known/`. `scripts/`, `docs/`, `.github/` yayınlanmaz. |
-| Maliyet | Cloudflare Pages ve GitHub Actions ücretsiz katman: 0 TL. |
+| Hesap güvenliği (kart kontrolü) | GitHub ve Cloudflare'de passkey / iki adımlı doğrulama, çevrimdışı kurtarma kodları, kök (Super Administrator) hesabın yalnızca yönetim için kullanılması, ayrı en az yetkili kimlik ve erişim incelemesi: [`docs/hesap-guvenligi.md`](docs/hesap-guvenligi.md) |
+| En az yetki | Cloudflare GitHub uygulaması yalnızca bu depoya erişebilir. Tüm iş akışlarında varsayılan `permissions: {}`; izinler yalnızca ihtiyaç duyan işe verilir (ör. veri işi: `contents` + `pull-requests`). |
+| Ana dal koruması | `main` dalında doğrudan push ve force push kapalı, PR zorunlu. Otomatik veri güncellemesi de PR ile gelir ([`scripts/pr_ile_birlestir.sh`](scripts/pr_ile_birlestir.sh)). |
+| Gizli anahtar ve bağımlılık taraması | gitleaks her push'ta, PR'da ve haftalık ([`guvenlik-taramasi.yml`](.github/workflows/guvenlik-taramasi.yml)); GitHub secret scanning + push protection; Dependabot haftalık ([`dependabot.yml`](.github/dependabot.yml)). Tüm Actions commit SHA'sı ile sabitlenmiştir. |
+| Kod olarak altyapı | `wrangler.toml` (Pages yapılandırması), `_headers` (güvenlik başlıkları), `scripts/build_site.sh` (yayınlanacak dosyaların izin listesi), `.github/` (CI/CD ve izleme). Panelden yapılan: Pages projesinin GitHub'a bağlanması ve derleme komutu, hesap güvenliği ayarları. |
+| Web güvenliği | HTTPS zorunlu, HSTS; CSP `script-src 'self'` (inline script/stil yok); COEP/COOP/CORP, `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy`, `frame-ancestors 'none'`. Mozilla Observatory **A+ (140/100)**, securityheaders.com **A+**. [`/.well-known/security.txt`](.well-known/security.txt), [`SECURITY.md`](SECURITY.md) |
+| Güvenlik testi | OWASP ZAP baseline, yalnızca kendi adresimize: önce 1 orta + 1 düşük → sonra **0 orta / düşük / yüksek**. Raporlar: [`docs/zap/once`](docs/zap/once/report_md.md), [`docs/zap/sonra`](docs/zap/sonra/report_md.md) |
+| Tehdit modeli | DFD üzerinde STRIDE, 11 tehdit, olasılık × etki risk puanı ve kalan risk: [`docs/tehdit-modeli.md`](docs/tehdit-modeli.md) |
+| İzleme ve alarm | 6 saatte bir erişim, güvenlik başlıkları ve veri tazeliği kontrolü; başarısızlıkta `ALARM` etiketli issue + e-posta ([`izleme.yml`](.github/workflows/izleme.yml)). Log'lar Actions çalışma kayıtlarında. Cloudflare başarısız yayın bildirimi. |
+| Olay müdahalesi | "API anahtarım sızdı" runbook'u: [`docs/runbook-anahtar-sizintisi.md`](docs/runbook-anahtar-sizintisi.md) |
+| Yayınlanan dosyalar | Yalnızca `index.html`, `manifest.webmanifest`, `sw.js`, `assets/`, `data/`, `.well-known/`. `scripts/`, `docs/`, `.github/` yayınlanmaz. |
+| Maliyet | Cloudflare Pages ve GitHub Actions ücretsiz katman: **0 TL**. Cloudflare'de ödeme yöntemi tanımlı değil; GitHub'da 0 USD bütçe uyarısı. |
 
 Not: Ders için önce Azure for Students denendi; üniversite hesabının Azure portalına erişimi kurum tarafından engellendiği için (26.10.2026, "Bu kaynağa erişiminiz yok") ödevde izin verilen Cloudflare ücretsiz katmanına geçildi.
 
@@ -87,7 +97,7 @@ Python 3.10+ yeterlidir, ek paket gerekmez.
 
 ## CV cümlesi
 
-*(Final teslimde eklenecek)*
+**Bulut ve güvenlik:** Canlı veri ürünümü Cloudflare Pages'e kod olarak altyapıyla taşıdım; anahtarsız mimari, SHA ile sabitlenmiş ve en az yetkili GitHub Actions, gitleaks ve Dependabot kurdum; CSP ve HSTS ile Mozilla Observatory'de A+ (140/100) aldım ve OWASP ZAP bulgularını 1 orta + 1 düşükten 0'a indirdim.
 
 ## Yapay zekâ kullanım beyanı
 
@@ -95,3 +105,4 @@ Python 3.10+ yeterlidir, ek paket gerekmez.
 | --- | --- | --- |
 | Claude (Anthropic) | Ödev yönergesini özetleme, veri çekme script'i ve GitHub Actions iş akışının ilk taslağı, README iskeleti, arayüz taslağı | *(doldurulacak)* |
 | Claude (Anthropic) | Başlangıç arayüzü (`index.html`, `assets/`), güvenlik başlıkları (`_headers`), `wrangler.toml`, `security.txt`, mimari diyagram, Cloudflare Pages kurulumu | *(doldurulacak)* |
+| Claude (Anthropic) | Bulut güvenliği: iş akışlarının sertleştirilmesi, gitleaks, Dependabot, izleme/alarm, ZAP iş akışı ve düzeltmeleri, STRIDE tehdit modeli, runbook, hesap güvenliği listesi | Hesap güvenliği ayarlarını (MFA, ruleset, secret scanning, Cloudflare üye/token testi) kendim yaptım ve kanıtladım; *(doldurulacak)* |
