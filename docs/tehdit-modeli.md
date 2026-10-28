@@ -24,7 +24,7 @@ Risk = Olasılık (1–5) × Etki (1–5). 1–5 düşük, 6–12 orta, 15–25 
 
 | # | STRIDE | Tehdit | Akış | Önce (O×E) | Alınan önlemler | Kalan (O×E) |
 | --- | --- | --- | --- | --- | --- | --- |
-| T1 | **S** Kimlik sahteciliği | **Geliştiricinin GitHub hesabının ele geçirilmesi** (kimlik avı, zayıf/tekrar kullanılan şifre) — *kart tehdidi* | ⑤ ⑥ | 4×5 = **20** | Passkey + TOTP, kurtarma kodları çevrimdışı, oturum ve uygulama erişim incelemesi, main dalı kuralı (PR zorunlu, force push yasak), gitleaks, Cloudflare uygulaması tek depoyla sınırlı. Ayrıntı aşağıda | 1×5 = **5** |
+| T1 | **S** Kimlik sahteciliği | **Geliştiricinin GitHub hesabının ele geçirilmesi** (kimlik avı, zayıf/tekrar kullanılan şifre) — *kart tehdidi* | ⑤ ⑥ | 4×5 = **20** | TOTP ile 2FA, kurtarma kodları çevrimdışı, oturum ve uygulama erişim incelemesi, main dalı kuralı (PR zorunlu, force push yasak), gitleaks, Cloudflare uygulaması tek depoyla sınırlı. Ayrıntı aşağıda | 1×5 = **5** |
 | T2 | **S** Kimlik sahteciliği | **Cloudflare hesabının ele geçirilmesi** — *kart tehdidi* | ⑥ | 3×5 = **15** | 2FA, Super Administrator yalnızca hesap yönetimi için, okuma rolüyle ayrı kimlik, denetim günlüğü (audit log), ödeme yöntemi tanımlı değil | 1×4 = **4** |
 | T3 | **T** Kurcalama | main dalına onaysız / kötü niyetli kod veya veri push edilmesi | ② ⑤ | 3×4 = **12** | Ruleset: doğrudan push kapalı, PR zorunlu, force push ve dal silme yasak; otomatik veri bile PR ile geliyor | 1×4 = **4** |
 | T4 | **T** Kurcalama | Tedarik zinciri: kullanılan bir GitHub Action'ın etiketi değiştirilip kötü kod çalıştırılması | ① ② | 2×5 = **10** | Tüm Actions commit SHA'sı ile sabitlendi; Dependabot haftalık güncelleme PR'ı açıyor; iş akışlarında `permissions: {}` | 1×4 = **4** |
@@ -44,9 +44,9 @@ Risk = Olasılık (1–5) × Etki (1–5). 1–5 düşük, 6–12 orta, 15–25 
 
 | Senaryo | Nasıl olur | Önleyen kontrol |
 | --- | --- | --- |
-| Kimlik avı (phishing) | Sahte "GitHub giriş" sayfası şifreyi ve TOTP kodunu çalar | **Passkey** alan adına bağlıdır, sahte sitede çalışmaz. TOTP gerçek zamanlı aracı sitelerle çalınabildiği için birincil yöntem passkey |
+| Kimlik avı (phishing) | Sahte "GitHub giriş" sayfası şifreyi ve TOTP kodunu çalar | Şu an TOTP 2FA: şifre tek başına yetmez. TOTP gerçek zamanlı aracı sitelerle çalınabildiği için sonraki adım alan adına bağlı **passkey** (sahte sitede çalışmaz) |
 | Zayıf / tekrar kullanılan şifre | Başka bir sitenin sızıntısındaki şifre denenir | Benzersiz, parola yöneticisiyle üretilmiş şifre + MFA zorunlu |
-| Telefon kaybı | MFA cihazı kaybolur, hesaba erişilemez | Kurtarma kodları çevrimdışı saklanır; ikinci passkey (örn. bilgisayar) tanımlı |
+| Telefon kaybı | MFA cihazı kaybolur, hesaba erişilemez | Kurtarma kodları çevrimdışı saklanır |
 | Oturum çerezi çalınması | Kötü amaçlı tarayıcı eklentisi oturumu çalar | Oturum listesi düzenli incelenir, tanınmayan oturumlar kapatılır |
 | Fazla yetkili uygulama / token | Unutulmuş bir OAuth uygulaması veya eski token kötüye kullanılır | Erişim incelemesi: yetkili uygulamalar ve token'lar listelenir, gereksizler kaldırılır; Cloudflare uygulaması tek depoyla sınırlı |
 | Kök hesabın günlük kullanımı | Super Administrator ile her gün giriş yapmak saldırı yüzeyini büyütür | Super Administrator yalnızca hesap yönetimi için; günlük inceleme ayrı, okuma yetkili kimlikle |
@@ -55,4 +55,4 @@ Risk = Olasılık (1–5) × Etki (1–5). 1–5 düşük, 6–12 orta, 15–25 
 
 **Doğrulama:** Kontrollerin uygulanması ve "en az yetkili rolün yapamadığı işlem" testi [hesap-guvenligi.md](hesap-guvenligi.md) dosyasında, ekran görüntüleriyle.
 
-**Kalan risk (5):** Passkey kimlik avını büyük ölçüde engeller. Kalan risk, cihazın kendisinin ele geçirilmesi (kötü amaçlı yazılım) ve kurtarma kodlarının kaybolması. Bunlar için güncel işletim sistemi ve kodların fiziksel olarak güvenli saklanması gerekiyor.
+**Kalan risk (5):** TOTP 2FA çalınan şifreyi tek başına işe yaramaz hâle getirir; gerçek zamanlı kimlik avına karşı passkey daha güçlüdür ve sonraki adımdır. Diğer kalan risk, cihazın kendisinin ele geçirilmesi (kötü amaçlı yazılım) ve kurtarma kodlarının kaybolması. Bunlar için güncel işletim sistemi ve kodların fiziksel olarak güvenli saklanması gerekiyor.

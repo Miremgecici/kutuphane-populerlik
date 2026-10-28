@@ -20,7 +20,7 @@ Bir yazılım/veri bilimi eğitim programının müfredat ekibi için, hangi kü
 - [x] Güvenlik başlıkları ve CSP (`_headers`), `/.well-known/security.txt`
 - [ ] Arayüz, ileri özellik, durumlar (27–28 Ekim)
 - [x] ZAP önce/sonra taraması, STRIDE tehdit modeli, runbook, izleme ve alarm, gitleaks, Dependabot (28 Ekim)
-- [ ] Hesap güvenliği ayarları: MFA/passkey, ruleset (branch protection), secret scanning, en az yetki testi (28–29 Ekim)
+- [x] Hesap güvenliği ayarları: GitHub ve Cloudflare'de TOTP 2FA + kurtarma kodları, ruleset (branch protection), secret scanning + push protection, okuma yetkili ikinci Cloudflare kimliği (28 Ekim). En az yetki testi demoda canlı gösterilecek.
 - [ ] Kullanıcı testi, portfolyo vaka sayfası, demo videosu (30 Ekim)
 
 ## Mimari
@@ -60,7 +60,7 @@ flowchart LR
 | Konu | Uygulama |
 | --- | --- |
 | Gizli anahtarlar | Ürün anahtar gerektiren hiçbir kaynak kullanmaz; istemci kodunda, depoda ve log'larda anahtar yoktur. Dağıtım token'ı da yoktur: Cloudflare Pages, GitHub uygulaması üzerinden yayınlar. CI yalnızca GitHub'ın kısa ömürlü `GITHUB_TOKEN`'ını kullanır. |
-| Hesap güvenliği (kart kontrolü) | GitHub ve Cloudflare'de passkey / iki adımlı doğrulama, çevrimdışı kurtarma kodları, kök (Super Administrator) hesabın yalnızca yönetim için kullanılması, ayrı en az yetkili kimlik ve erişim incelemesi: [`docs/hesap-guvenligi.md`](docs/hesap-guvenligi.md) |
+| Hesap güvenliği (kart kontrolü) | GitHub ve Cloudflare'de iki adımlı doğrulama (TOTP; passkey sonraki adım), çevrimdışı kurtarma kodları, kök (Super Administrator) hesabın yalnızca yönetim için kullanılması, ayrı en az yetkili kimlik ve erişim incelemesi: [`docs/hesap-guvenligi.md`](docs/hesap-guvenligi.md) |
 | En az yetki | Cloudflare GitHub uygulaması yalnızca bu depoya erişebilir. Tüm iş akışlarında varsayılan `permissions: {}`; izinler yalnızca ihtiyaç duyan işe verilir (ör. veri işi: `contents` + `pull-requests`). |
 | Ana dal koruması | `main` dalında doğrudan push ve force push kapalı, PR zorunlu. Otomatik veri güncellemesi de PR ile gelir ([`scripts/pr_ile_birlestir.sh`](scripts/pr_ile_birlestir.sh)). |
 | Gizli anahtar ve bağımlılık taraması | gitleaks her push'ta, PR'da ve haftalık ([`guvenlik-taramasi.yml`](.github/workflows/guvenlik-taramasi.yml)); GitHub secret scanning + push protection; Dependabot haftalık ([`dependabot.yml`](.github/dependabot.yml)). Tüm Actions commit SHA'sı ile sabitlenmiştir. |
