@@ -1,0 +1,35 @@
+name: ZAP güvenlik taraması
+
+# OWASP ZAP baseline (pasif) taraması. YALNIZCA kendi ürün adresimize yapılır.
+# Raporlar "Artifacts" bölümünde zap_scan_<etiket> adıyla saklanır.
+on:
+  workflow_dispatch:
+    inputs:
+      etiket:
+        description: "Rapor etiketi (örn. once, sonra)"
+        required: true
+        default: "tarama"
+
+permissions:
+  contents: read
+
+jobs:
+  zap:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      - name: Depoyu al (kural dosyası için)
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+
+      - name: ZAP baseline taraması
+        uses: zaproxy/action-baseline@de8ad967d3548d44ef623df22cf95c3b0baf8b25 # v0.15.0
+        with:
+          target: "https://kutuphane-populerlik.pages.dev"
+          allow_issue_writing: false
+          fail_action: false
+          artifact_name: "zap_scan_${{ inputs.etiket }}"
+          cmd_options: "-a -j"
