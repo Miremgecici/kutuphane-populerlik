@@ -1,29 +1,32 @@
 name: ZAP güvenlik taraması
 
 # OWASP ZAP baseline (pasif) taraması. YALNIZCA kendi ürün adresimize yapılır.
-# Raporlar "Artifacts" bölümünde zap_scan_<etiket> adıyla saklanır.
+# Raporlar docs/zap/<etiket>/ klasörüne kaydedilir (önce/sonra karşılaştırması için).
 on:
   workflow_dispatch:
     inputs:
       etiket:
-        description: "Rapor etiketi (örn. once, sonra)"
+        description: "Rapor etiketi: yalnızca küçük harf, rakam ve tire (örn. once, sonra)"
         required: true
         default: "tarama"
 
-permissions:
-  contents: read
+permissions: {}
 
 jobs:
   zap:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
-      contents: read
+      contents: write        # raporları depoya kaydetmek için
+      pull-requests: write   # raporları PR ile birleştirmek için
     steps:
-      - name: Depoyu al (kural dosyası için)
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
-        with:
-          persist-credentials: false
+      - name: Etiketi doğrula
+        env:
+          ETIKET: ${{ inputs.etiket }}
+        run: |
+          [[ "$ETIKET" =~ ^[a-z0-9-]{1,30}$ ]] || { echo "Geçersiz etiket"; exit 1; }
+
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
       - name: ZAP baseline taraması
         uses: zaproxy/action-baseline@de8ad967d3548d44ef623df22cf95c3b0baf8b25 # v0.15.0
@@ -33,3 +36,16 @@ jobs:
           fail_action: false
           artifact_name: "zap_scan_${{ inputs.etiket }}"
           cmd_options: "-a -j"
+
+      - name: Raporları depoya kaydet
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ETIKET: ${{ inputs.etiket }}
+        run: |
+          mkdir -p "docs/zap/$ETIKET"
+          for f in report_html.html report_md.md report_json.json; do
+            [ -f "$f" ] && sudo cp "$f" "docs/zap/$ETIKET/$f"
+          done
+          sudo chown -R "$(id -u):$(id -g)" docs/zap
+          date -u +'%Y-%m-%d %H:%M UTC' > "docs/zap/$ETIKET/tarama_zamani.txt"
+          bash scripts/pr_ile_birlestir.sh zap "ZAP raporu: $ETIKET" "docs/zap/$ETIKET"
