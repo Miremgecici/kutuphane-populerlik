@@ -1992,6 +1992,10 @@
    {
     "date": "2026-11-11",
     "downloads": 41360749
+   },
+   {
+    "date": "2026-11-12",
+    "downloads": 44021632
    }
   ],
   "svelte": [
@@ -3986,6 +3990,10 @@
    {
     "date": "2026-11-11",
     "downloads": 1508297
+   },
+   {
+    "date": "2026-11-12",
+    "downloads": 1674194
    }
   ],
   "express": [
@@ -5980,6 +5988,10 @@
    {
     "date": "2026-11-11",
     "downloads": 32368237
+   },
+   {
+    "date": "2026-11-12",
+    "downloads": 35012984
    }
   ],
   "d3": [
@@ -9968,10 +9980,14 @@
    {
     "date": "2026-11-11",
     "downloads": 4110746
+   },
+   {
+    "date": "2026-11-12",
+    "downloads": 4385807
    }
   ]
  },
  "source": "https://github.com/npm/registry/blob/main/docs/download-counts.md",
- "last_updated": "2026-11-12T11:01:44+00:00",
+ "last_updated": "2026-11-13T10:55:26+00:00",
  "errors": []
 }
