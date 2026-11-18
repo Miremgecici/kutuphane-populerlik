@@ -2012,6 +2012,10 @@
    {
     "date": "2026-11-16",
     "downloads": 44243682
+   },
+   {
+    "date": "2026-11-17",
+    "downloads": 46672963
    }
   ],
   "svelte": [
@@ -4026,6 +4030,10 @@
    {
     "date": "2026-11-16",
     "downloads": 1692413
+   },
+   {
+    "date": "2026-11-17",
+    "downloads": 1807840
    }
   ],
   "express": [
@@ -6040,6 +6048,10 @@
    {
     "date": "2026-11-16",
     "downloads": 33657050
+   },
+   {
+    "date": "2026-11-17",
+    "downloads": 35810643
    }
   ],
   "d3": [
@@ -8054,6 +8066,10 @@
    {
     "date": "2026-11-16",
     "downloads": 5718383
+   },
+   {
+    "date": "2026-11-17",
+    "downloads": 6235857
    }
   ],
   "vue": [
@@ -10068,10 +10084,14 @@
    {
     "date": "2026-11-16",
     "downloads": 4478839
+   },
+   {
+    "date": "2026-11-17",
+    "downloads": 4764192
    }
   ]
  },
  "source": "https://github.com/npm/registry/blob/main/docs/download-counts.md",
- "last_updated": "2026-11-17T11:48:15+00:00",
+ "last_updated": "2026-11-18T11:36:55+00:00",
  "errors": []
 }
